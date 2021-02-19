@@ -1,0 +1,64 @@
+笔记参考 <高级Bash脚本编程指南>
+
+知识点1：（）{}大括号小括号用法
+1.初始化数组：
+使用小括号，将成员赋值给数组，
+Array=(element1 element2 element3)
+eg:
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ array=(1 2 3)
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ for i in ${array[@]};
+> do
+> echo $i
+> done
+1
+2
+3
+
+2.使用大括号:
+大括号功能扩展：
+XiaoMai-Series:~/shell/day01$ cat {file1,file2,file3} > file_combine 
+ypc@ypc-XiaoMai-Series:~/shell/day01$ cat file_combine 
+file1
+file2
+file3
+#将多个文件内容通过大括号整合并重定向到合并文件中.
+ypc@ypc-XiaoMai-Series:~/shell/day01$ cp file_combine{,_bf}
+ypc@ypc-XiaoMai-Series:~/shell/day01$ ls
+file1  file2  file3  file_combine  file_combine_bf  note
+#通过大括号，可以将文件备份成不同后缀的备份文件
+
+3.通过通配(globbing)将对大括号中的文件名做扩展，一个命令可以对大括号中以逗号隔开的文件列表起作用
+eg:
+ypc@ypc-XiaoMai-Series:~/shell/day01$ echo {file1,file2}\ :{\ A," B",' C'}
+file1 : A file1 : B file1 : C file2 : A file2 : B file2 : C
+ypc@ypc-XiaoMai-Series:~/shell/day01$ cat file1 file2 file3
+A B C
+A B C
+A B C
+
+4.使用{}代表代码块，又被称为内部组，这个结构事实上创建了一个匿名函数（没有名称的函数），然而与标准函数不同，其中声明的变量，对脚本其它部分还是可见的。
+eg:
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ { local a; a=123; }
+bash: local: can only be used in a function
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ a=123
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ { a=321; }
+ypc@ypc-XiaoMai-Series:.../src/msdk(develop)$ echo "a=$a"
+a=321
+#上述演示，显示大括号扩起部分为定义一个匿名函数，且函数内部变量，外部可以访问
+
+大括号结构的代码重定向功能，参见：d01_1.sh,
+脚本功能：读取/etc/fstab下的首2行内容
+
+附注：awk功能小结：
+参见awk_example.awk，
+awk用法：通过awk <域分隔符指明> <print $?> 文件
+可以打印显示指定域
+eg:
+ypc@ypc-XiaoMai-Series:~/shell/day01$ read line1 < file1 | echo $line1 | awk '{print $1}'
+A
+ypc@ypc-XiaoMai-Series:~/shell/day01$ cat file1
+A B C
+#使用read 读取文件第一行，通过awk读取第一行中第一个域的内容
+
+大括号将一个代码块的结果保存到文件中
+参见代码:d01_2.sh

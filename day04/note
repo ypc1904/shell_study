@@ -1,0 +1,100 @@
+教材 《高级Bash脚本编程指南》
+Page:47
+
+1.操作符 <, >
+作用：ASCII码字符比较
+参见代码：d03_1.sh
+
+2.操作符\<, \>
+ypc@ypc-XiaoMai-Series:~/shell/day04$ grep '\<the\>' textfile 
+the
+the
+ypc@ypc-XiaoMai-Series:~/shell/day04$ cat textfile 
+the
+the
+theory
+
+3.操作符 |
+作用：管道，分析前边命令的输出，并将输出作为后面命令的输入。这是一种产生命令链的好方法：
+参见代码:d04_1.sh
+ypc@ypc-XiaoMai-Series:~/shell/day04$ ls -l .
+total 12
+-rw-rw-r-- 1 ypc ypc 449 2月  12 10:26 note
+-rw-rw-r-- 1 ypc ypc  15 2月  12 10:23 textfile
+-rwxrw-r-- 1 ypc ypc 223 2月  12 10:29 d04_1.sh
+#代码中，通过命令链，输出所有.lst文件中不同内容的行
+ypc@ypc-XiaoMai-Series:~/shell/day04$ ./d04_1.sh 
+total 24
+-rw-rw-r-- 1 ypc ypc 109 2月  12 10:31 1.lst
+-rw-rw-r-- 1 ypc ypc 109 2月  12 10:31 2.lst
+-rw-rw-r-- 1 ypc ypc 218 2月  12 10:31 3.lst
+-rwxrw-r-- 1 ypc ypc 223 2月  12 10:29 d04_1.sh
+-rw-rw-r-- 1 ypc ypc 449 2月  12 10:26 note
+-rw-rw-r-- 1 ypc ypc  15 2月  12 10:23 textfile
+daiyueqing
+xinbenling
+yulisheng
+yupengcheng
+zhangqian
+zhangyan
+zhangyongsheng
+
+补充：管道是进程间通讯的一个典型办法，将一个进程的stdout放到另一个进程的stdin中.标准的方法是将一个一般命令的输出，比如cat或者echo，传递到一个'过滤命令' （在这个过滤命令中将处理输入）中，然后得到结果。
+eg: cat $filename1 $filename2 | grep $search_word
+
+当然输出的命令也可以传递到脚本中:
+参见代码：d04_2.sh
+ypc@ypc-XiaoMai-Series:~/shell/day04$ ls
+note  textfile  1.lst  2.lst  3.lst  d04_1.sh  d04_2.sh
+ypc@ypc-XiaoMai-Series:~/shell/day04$ ls -l | ./d04_2.sh 
+TOTAL 28
+-RW-RW-R-- 1 YPC YPC 449 2月  12 10:26 NOTE
+-RW-RW-R-- 1 YPC YPC  15 2月  12 10:23 TEXTFILE
+-RW-RW-R-- 1 YPC YPC 109 2月  12 10:31 1.LST
+-RW-RW-R-- 1 YPC YPC 109 2月  12 10:31 2.LST
+-RW-RW-R-- 1 YPC YPC 218 2月  12 10:31 3.LST
+-RWXRW-R-- 1 YPC YPC 223 2月  12 10:29 D04_1.SH
+-RWXRW-R-- 1 YPC YPC 192 2月  12 10:42 D04_2.SH
+
+补充：管道中的每个进程的stdout必须被下一个进程作为stdin来读入，否则，数据流会阻塞，并且管道将会产生一些非预期的行为
+eg:
+XiaoMai-Series:~/shell/day04$ cat file1 file2 | ls -l | sort
+-rw-rw-r-- 1 ypc ypc 109 2月  12 10:31 1.lst
+-rw-rw-r-- 1 ypc ypc 109 2月  12 10:31 2.lst
+-rw-rw-r-- 1 ypc ypc  15 2月  12 10:23 textfile
+-rw-rw-r-- 1 ypc ypc 218 2月  12 10:31 3.lst
+-rw-rw-r-- 1 ypc ypc 449 2月  12 10:26 note
+-rw-rw-r-- 1 ypc ypc   6 2月  12 10:47 file1
+-rw-rw-r-- 1 ypc ypc   6 2月  12 10:47 file2
+-rwxrw-r-- 1 ypc ypc 192 2月  12 10:42 d04_2.sh
+-rwxrw-r-- 1 ypc ypc 223 2月  12 10:29 d04_1.sh
+total 36
+#上述示例说明：如果第一个进程的输出不能作为第二个命令的输入，则该命令链将不会按照预期输出结果。
+
+补充：作为子进程的运行的管道，不能够改变脚本的变量
+eg:
+ypc@ypc-XiaoMai-Series:~/shell/day04$ variable="initial_value"
+ypc@ypc-XiaoMai-Series:~/shell/day04$ echo "new_value" | read variable
+ypc@ypc-XiaoMai-Series:~/shell/day04$ echo "variable = $variable" #variable = initial_value
+variable = initial_value
+
+#为了在上述子进程运行的管道中，获得赋值的变量的值，需要在子进程中获取变量值
+eg:
+ypc@ypc-XiaoMai-Series:~/shell/day04$ echo "child_process_variable" | (read val; echo $val) 
+child_process_variable
+
+如果管道中的某个命令产生了一个异常，并中途失敗，那么这个管道将过早的终止，这种行为被叫做broken pipe, 并且这种状态下将发送一个SIGPIPE信号.
+
+4. 操作符 >|
+作用：强制重定向（即使设置了noclobber选项，-- 就是-C选项).这将强制的覆盖一个现存文件.
+ypc@ypc-XiaoMai-Series:~/shell/day04$ echo "force redirection" >| file1
+ypc@ypc-XiaoMai-Series:~/shell/day04$ cat file
+cat: file: No such file or directory
+ypc@ypc-XiaoMai-Series:~/shell/day04$ cat file1
+force redirection
+
+5. 操作符 ||
+作用：或-逻辑操作符，在一个条件测试结构中，如果条件测试结构两边中的任意一边结果为true的话，||操作就会返回0(代表执行成功)。
+
+6. 操作符 &
+作用1：当前程序需要运行在后台中，一个命令后面跟&表示该命令在后台运行

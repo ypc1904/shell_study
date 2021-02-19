@@ -1,0 +1,27 @@
+参考教材 《高级Bash脚本编程指南》
+
+1. basename
+功能：从文件名中去掉路劲信息，只打印文件名。结构basename $0可以让脚本获得它自己的名字，也就是，它被调用的名字，可以用来显示“用法”信息，比如如果你调用脚本的时候缺少参数，可以使用如下语句：
+printf "Usage: `basename $0` arg1 arg2 ... argn"
+
+2.dirname
+功能：从带路径的文件名字符串中去掉文件名（basename）,只打印路劲信息。
+
+补充：basename和dirname可以操作任何字符串。它们的参数不一定是一个真正存在的文件，甚至可以不是一个文件名。
+
+3.sum,cksum,md5sum,sha1sum
+功能：这些都是用来产生checksum的工具，checksum是对文件的内容进行数学计算而得到的，它的目的是用来检验文件的完整性，出于安全目的一个脚本可能会有一个checksum列表，这样可以确保关键系统文件的内容不会被修改或损坏。对于需要安全性的应用来说，应该使用md5sum(message digest 5 checksum)命令，或者使用更好更新的sha1sum命令（安全Hash算法）
+eg:
+ypc@ypc-XiaoMai-Series:~/shell/day05$ sudo cksum /boot/vmlinuz-4.15.0-132-generic 
+3922962679 8213536 /boot/vmlinuz-4.15.0-132-generic
+ypc@ypc-XiaoMai-Series:~/shell/day05$ echo -n "Top Secret" | cksum
+3391003827 10
+ypc@ypc-XiaoMai-Series:~/shell/day05$ sudo md5sum /boot/vmlinuz-4.15.0-132-generic 
+bdaec751bcec90960ca61291250d0678  /boot/vmlinuz-4.15.0-132-generic
+ypc@ypc-XiaoMai-Series:~/shell/day05$ echo -n "Top Secret" | md5sum
+8babc97a6f62a4649716f4df8d61728f  -
+
+cksum将会显示目标尺寸（以字节为单位），目标可以是stdout,也可以是文件。md5sum和sha1sum命令在它们收到来自于stdout的输入的时候，显示一个dash.
+
+
+

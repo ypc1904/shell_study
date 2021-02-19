@@ -1,0 +1,29 @@
+教材 《高级Bash脚本编程指南》
+
+操作符 > &> >& >> < <>
+1.重定向操作符：
+scriptname >filename 重定向scriptname的输出到文件filename中,如果filename存在，则覆盖之前filename的内容
+
+cmd &>filename 重定向cmd的stdout和stderr到filename中。
+cmd >&2 重定向cmd的stdout到stderr中。
+scriptname >>filename 把scriptname的输出追加到文件filename中，如果filename不存在，则创建filename文件。
+[i]<>filename 打开文件filename用来读写，并且分配文件描述符i给这个文件。如果文件不存在，则创建这个文件
+
+2.关系操作符:
+在不同的上下文中，'<' 和 ‘>’ 可用来做字符串比较操作。
+而在另一种上下文中，'<' 和 '>' 可用来做整数比较操作。
+
+3.<<
+用于here document中的重定向
+
+4. <<<
+用在here string中的重定向
+
+5 <, >
+ASCII码字符比较
+
+
+
+
+
+ 
